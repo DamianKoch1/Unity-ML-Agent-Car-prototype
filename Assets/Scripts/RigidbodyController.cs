@@ -10,10 +10,13 @@ public class RigidbodyController : MonoBehaviour
     private float maxForwardForce;
 
     [SerializeField]
-    private float rotationForce;
+    private float rotateSpeed;
 
     [SerializeField]
     private float brakeStrength;
+
+    [SerializeField]
+    private float driftSidewaysSpeed;
 
     private RigidbodySettings baseRbSettings;
 
@@ -101,15 +104,25 @@ public class RigidbodyController : MonoBehaviour
         dir.Normalize();
         rb.AddForce(dir * maxForwardForce * forward);
 
-        if (rb.velocity.magnitude > 2)
+        var localVelocity = transform.InverseTransformDirection(rb.velocity);
+        if (localVelocity.z > 2)
         {
-            rb.AddRelativeTorque(0, steer * rotationForce, 0, ForceMode.Acceleration);
+            rb.AddRelativeTorque(0, steer * rotateSpeed, 0, ForceMode.Acceleration);
+        }
+        else if (localVelocity.z < -2f)
+        {
+            rb.AddRelativeTorque(0, -steer * rotateSpeed, 0, ForceMode.Acceleration);
+
         }
     }
 
     private void BrakeMovement(float forward, float steer)
     {
         rb.AddForce(-rb.velocity * brakeStrength, ForceMode.Acceleration);
+        if (forward > 0)
+        {
+            rb.AddForce(-transform.right * driftSidewaysSpeed * steer, ForceMode.Acceleration);
+        }
     }
 
     private bool IsGrounded()

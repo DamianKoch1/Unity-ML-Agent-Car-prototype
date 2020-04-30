@@ -31,6 +31,9 @@ public class PlayerCamera : MonoBehaviour
     private void Update()
     {
         targetPos = Vector3.Lerp(targetPos, target.transform.position, Time.deltaTime * 5);
-        transform.position = targetPos + offset;
+        transform.position = targetPos + offset.x * -target.transform.right + offset.y * Vector3.up + offset.z * target.transform.forward;
+        transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(target.transform.position + target.transform.forward * focusPointDistance - transform.position), Time.deltaTime * 5);
+        transform.LookAt(target.transform.position + target.transform.forward * focusPointDistance);
+
     }
 }
