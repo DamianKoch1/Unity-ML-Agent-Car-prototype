@@ -28,7 +28,7 @@ public abstract class CarController<T> : MonoBehaviour where T : Axle
 
     protected Rigidbody rb;
 
-    CarDebugGUI debugGUI;
+    DebugGUI debugGUI;
 
     protected virtual void Start()
     {
@@ -36,7 +36,7 @@ public abstract class CarController<T> : MonoBehaviour where T : Axle
         rb.centerOfMass = centerOfMass;
         frontAxle.Initialize();
         rearAxle.Initialize();
-        debugGUI = new CarDebugGUI(rb);
+        debugGUI = new DebugGUI();
     }
 
     protected virtual void Update()
@@ -56,7 +56,7 @@ public abstract class CarController<T> : MonoBehaviour where T : Axle
 
     private void OnGUI()
     {
-        debugGUI.OnGUI();
+        debugGUI.OnGUI("Velocity: " + debugGUI.LogVector3(rb.velocity));
     }
 
     protected virtual void ProcessInput()
@@ -126,33 +126,34 @@ public abstract class Axle
     public abstract void OnBrakeStop();
 }
 
-public class CarDebugGUI
+public class DebugGUI
 {
-    private Rigidbody target;
+    private Rect windowRect = new Rect(20, 20, 250, 50);
 
-    private Rect windowRect = new Rect(20, 20, 250, 20);
+    private string[] content;
 
 
-    public CarDebugGUI(Rigidbody _target)
+    public void OnGUI(params string[] _content)
     {
-        target = _target;
-    }
-
-    public void OnGUI()
-    {
+        content = _content;
         windowRect = GUILayout.Window(0, windowRect, UpdateWindow, "Car info");
     }
 
     private void UpdateWindow(int id)
     {
-        var vel = target.velocity;
-        var magnitude = Mathf.Round(vel.magnitude * 10) / 10;
-        vel = new Vector3(
-            Mathf.Round(vel.x * 10) / 10,
-            Mathf.Round(vel.y * 10) / 10,
-            Mathf.Round(vel.z * 10) / 10);
+       foreach (var line in content)
+        {
+            GUILayout.Label(line);
+        }
+    }
 
-
-        GUILayout.Label("Velocity: " + magnitude + " " + vel);
+    public string LogVector3(Vector3 v)
+    {
+        var magnitude = Mathf.Round(v.magnitude * 10) / 10;
+        v = new Vector3(
+            Mathf.Round(v.x * 10) / 10,
+            Mathf.Round(v.y * 10) / 10,
+            Mathf.Round(v.z * 10) / 10);
+        return magnitude + " " + v;
     }
 }

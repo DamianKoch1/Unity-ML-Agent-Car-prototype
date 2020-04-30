@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class TrackMilestone : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    private float reward = 0.1f;
 
-    // Update is called once per frame
-    void Update()
+    [HideInInspector]
+    public bool activated;
+
+    private void OnTriggerEnter(Collider other)
     {
-        
+        if (activated) return;
+        if (other.isTrigger) return;
+        var agent = other.GetComponent<RigidbodyAgent>();
+        if (!agent) return;
+        agent.AddReward(reward);
+        activated = true;
     }
 }

@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class RigidbodyController : MonoBehaviour
 {
+    [HideInInspector]
+    public bool controlledByAgent;
+
     private Rigidbody rb;
 
     [SerializeField]
@@ -25,29 +28,53 @@ public class RigidbodyController : MonoBehaviour
 
     private bool braking;
 
-    CarDebugGUI debugGUI;
+    DebugGUI debugGUI;
 
     [SerializeField]
     private GameObject[] wheels;
 
     [SerializeField]
     private ParticleSystem[] driftParticles;
+
+    float inputX;
+
+    float inputZ;
     
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         baseRbSettings = new RigidbodySettings(rb);
-        debugGUI = new CarDebugGUI(rb);
+        debugGUI = new DebugGUI();
     }
 
     private void Update()
     {
+        if (controlledByAgent) return;
+        inputX = Input.GetAxis("Horizontal");
+        inputZ = Input.GetAxis("Vertical");
         if (Input.GetButtonDown("Jump"))
         {
             OnBrakeStart();
         }
         if (Input.GetButtonUp("Jump"))
+        {
+            OnBrakeStop();
+        }
+    }
+
+    public void UpdateFromAgent(float x, float z, float brake)
+    {
+        inputX = x;
+        inputZ = z;
+        if (!braking)
+        {
+            if (brake > 0)
+            {
+                OnBrakeStart();
+            }
+        }
+        else if (brake <= 0)
         {
             OnBrakeStop();
         }
@@ -59,8 +86,6 @@ public class RigidbodyController : MonoBehaviour
 
         if (!IsGrounded()) return;
 
-        var inputX = Input.GetAxis("Horizontal");
-        var inputZ = Input.GetAxis("Vertical");
 
 
         Movement(inputZ, inputX);
@@ -74,7 +99,8 @@ public class RigidbodyController : MonoBehaviour
 
     private void OnGUI()
     {
-        debugGUI.OnGUI();
+        if (controlledByAgent) return;
+        debugGUI.OnGUI("Velocity: " + debugGUI.LogVector3(rb.velocity));
     }
 
     private void OnBrakeStart()
