@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Goal : MonoBehaviour
+public class Goal : TrackMilestone
 {
     [SerializeField]
     private GameObject milestonesParent;
@@ -14,9 +14,13 @@ public class Goal : MonoBehaviour
         milestones = milestonesParent.GetComponentsInChildren<TrackMilestone>();
     }
 
-    private void OnTriggerEnter(Collider other)
+    protected override void OnTriggerEnter(Collider other)
     {
-        if (!MetAllMilestones()) return;
+        if (!MetAllMilestones())
+        {
+            base.OnTriggerEnter(other);
+            return;
+        }
         if (other.isTrigger) return;
         var agent = other.GetComponent<RigidbodyAgent>();
         if (!agent) return;

@@ -104,5 +104,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bf1f4965debcf143836eb2d171a177d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  reward: 0.1
+  reward: 1
   activated: 0

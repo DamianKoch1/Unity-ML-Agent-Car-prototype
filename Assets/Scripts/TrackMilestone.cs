@@ -5,12 +5,11 @@ using UnityEngine;
 public class TrackMilestone : MonoBehaviour
 {
     [SerializeField]
-    private float reward = 0.1f;
+    protected float reward = 1f;
 
-    [HideInInspector]
     public bool activated;
 
-    private void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         if (activated) return;
         if (other.isTrigger) return;

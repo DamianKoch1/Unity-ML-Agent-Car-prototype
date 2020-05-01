@@ -4726,6 +4726,16 @@ PrefabInstance:
       propertyPath: manualControl
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1011761307099723561, guid: 9bf4e32551c8f6c43b59a1bad2d789db,
+        type: 3}
+      propertyPath: forwardReward
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1011761307099723561, guid: 9bf4e32551c8f6c43b59a1bad2d789db,
+        type: 3}
+      propertyPath: collisionPunishment
+      value: -0.4
+      objectReference: {fileID: 0}
     - target: {fileID: 8859146098174863627, guid: 9bf4e32551c8f6c43b59a1bad2d789db,
         type: 3}
       propertyPath: m_Model

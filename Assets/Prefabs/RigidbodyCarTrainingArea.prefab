@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 4552117688390824693}
   - component: {fileID: 4552117688390824692}
   - component: {fileID: 4552117688390824695}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -494,11 +494,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4552117687612688005}
     m_Modifications:
-    - target: {fileID: 5632487246170696008, guid: a33b5c2587acd8c47bf9aa0bcac42c27,
-        type: 3}
-      propertyPath: milestonesParent
-      value: 
-      objectReference: {fileID: 4552117687612688004}
     - target: {fileID: 1635887288962179088, guid: a33b5c2587acd8c47bf9aa0bcac42c27,
         type: 3}
       propertyPath: m_Name
@@ -559,6 +554,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5632487246170696008, guid: a33b5c2587acd8c47bf9aa0bcac42c27,
+        type: 3}
+      propertyPath: milestonesParent
+      value: 
+      objectReference: {fileID: 4552117687612688004}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a33b5c2587acd8c47bf9aa0bcac42c27, type: 3}
 --- !u!4 &3282492420599754229 stripped
@@ -889,11 +889,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4552117687869983562}
     m_Modifications:
-    - target: {fileID: 3541554884402569203, guid: 40352bdf59ce18c40947d1c3ac401198,
-        type: 3}
-      propertyPath: milestonesParent
-      value: 
-      objectReference: {fileID: 4552117687612688004}
     - target: {fileID: 5773373819594207805, guid: 40352bdf59ce18c40947d1c3ac401198,
         type: 3}
       propertyPath: m_Name
@@ -954,6 +949,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3541554884402569203, guid: 40352bdf59ce18c40947d1c3ac401198,
+        type: 3}
+      propertyPath: milestonesParent
+      value: 
+      objectReference: {fileID: 4552117687612688004}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40352bdf59ce18c40947d1c3ac401198, type: 3}
 --- !u!4 &8007603631880994587 stripped

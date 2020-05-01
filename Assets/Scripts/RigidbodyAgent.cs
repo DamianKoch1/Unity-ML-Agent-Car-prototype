@@ -41,6 +41,17 @@ public class RigidbodyAgent : Agent
 
     private Stopwatch standStillStopwatch;
 
+    [SerializeField]
+    private GameObject raycastTargetsParent;
+
+    private Vector3 raycastStartPos => raycastTargetsParent.transform.position;
+
+    [SerializeField]
+    private LayerMask raycastLayer;
+
+    [SerializeField]
+    private float raycastDistance;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -80,6 +91,7 @@ public class RigidbodyAgent : Agent
     {
         sensor.AddObservation(transform.localPosition);
         sensor.AddObservation(rb.velocity);
+        CollectRaycastObservations(sensor);
     }
 
     public override void OnActionReceived(float[] vectorAction)
@@ -88,9 +100,21 @@ public class RigidbodyAgent : Agent
 
         AddReward(stepPunishment);
 
+        GetMovementRewards(vectorAction);
+
+        CheckLoseConditions();
+
+        if (debug)
+        {
+            lastAction = new Vector3(vectorAction[0], vectorAction[1], vectorAction[2]);
+        }
+    }
+
+    private void GetMovementRewards(float[] input)
+    {
         if (rb.velocity.magnitude > 5)
         {
-            if (vectorAction[1] > 0)
+            if (input[1] > 0)
             {
                 AddReward(forwardReward);
             }
@@ -102,13 +126,16 @@ public class RigidbodyAgent : Agent
             {
                 standStillStopwatch = Stopwatch.StartNew();
             }
-            else if (standStillStopwatch.ElapsedMilliseconds > maxStandStillSeconds * 1000)
+            else if (standStillStopwatch.ElapsedMilliseconds * Time.timeScale > maxStandStillSeconds * 1000)
             {
                 SetReward(-1);
                 EndEpisode();
             }
         }
+    }
 
+    private void CheckLoseConditions()
+    {
         if (transform.up.y < 0.3f)
         {
             SetReward(-1);
@@ -120,10 +147,25 @@ public class RigidbodyAgent : Agent
             SetReward(-1);
             EndEpisode();
         }
+    }
 
-        if (debug)
+    private void CollectRaycastObservations(VectorSensor sensor)
+    {
+        RaycastHit hit;
+        foreach (Transform target in raycastTargetsParent.transform)
         {
-            lastAction = new Vector3(vectorAction[0], vectorAction[1], vectorAction[2]);
+            if (Physics.Raycast(raycastStartPos, target.position - raycastStartPos, out hit, raycastDistance, raycastLayer))
+            {
+                UnityEngine.Debug.DrawLine(raycastStartPos, hit.point, Color.red, 0.2f);
+                sensor.AddObservation(true);
+                sensor.AddObservation(hit.distance);
+            }
+            else
+            {
+                UnityEngine.Debug.DrawLine(raycastStartPos, raycastStartPos + (target.position - raycastStartPos).normalized * raycastDistance, Color.green, 0.2f);
+                sensor.AddObservation(false);
+                sensor.AddObservation(raycastDistance);
+            }
         }
     }
 
