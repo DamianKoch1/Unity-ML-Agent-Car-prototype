@@ -9,31 +9,32 @@ public class Goal : TrackMilestone
 
     private TrackMilestone[] milestones;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         milestones = milestonesParent.GetComponentsInChildren<TrackMilestone>();
     }
 
     protected override void OnTriggerEnter(Collider other)
     {
-        if (!MetAllMilestones())
+        if (other.isTrigger) return;
+        var agent = other.GetComponent<RigidbodyAgent>();
+        if (!agent) return;
+        if (!CanFinishTrack(agent))
         {
             base.OnTriggerEnter(other);
             return;
         }
-        if (other.isTrigger) return;
-        var agent = other.GetComponent<RigidbodyAgent>();
-        if (!agent) return;
         agent.SetReward(1);
         agent.EndEpisode();
         print("Goal reached");
     }
 
-    private bool MetAllMilestones()
+    private bool CanFinishTrack(RigidbodyAgent agent)
     {
         foreach (var milestone in milestones)
         {
-            if (!milestone.activated) return false;
+            if (!milestone.enteredPlayers.Contains(agent)) return false;
         }
         return true;
     }

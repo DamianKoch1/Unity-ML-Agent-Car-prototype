@@ -16,10 +16,13 @@ public class RigidbodyAgent : Agent
     private float stepPunishment = -0.05f;
 
     [SerializeField]
-    private float collisionPunishment = -0.2f;
+    private float brakePunishment = -0.08f;
 
     [SerializeField]
     private float forwardReward = 0.02f;
+
+    [SerializeField]
+    private float highSpeedReward = 0.02f;
 
     [SerializeField]
     private float maxStandStillSeconds = 5;
@@ -52,6 +55,16 @@ public class RigidbodyAgent : Agent
     [SerializeField]
     private float raycastDistance;
 
+    public int numHitMilestones;
+
+    private Goal goal;
+
+    public TrackMilestone target;
+
+    private float targetDistance => Vector3.Distance(rb.position, target.transform.position);
+
+
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -61,6 +74,8 @@ public class RigidbodyAgent : Agent
         startPos = transform.position;
         startRotation = transform.rotation;
         milestones = milestonesParent.GetComponentsInChildren<TrackMilestone>();
+        goal = FindObjectOfType<Goal>();
+        target = goal;
         if (debug)
         {
             debugGUI = new DebugGUI();
@@ -73,9 +88,14 @@ public class RigidbodyAgent : Agent
         rb.MoveRotation(startRotation);
         rb.velocity = Vector3.zero;
         controller.UpdateFromAgent(0, 0, 0);
+        numHitMilestones = 0;
+        target = goal;
         foreach (var milestone in milestones)
         {
-            milestone.activated = false;
+            if (milestone.enteredPlayers.Contains(this))
+            {
+                milestone.enteredPlayers.Remove(this);
+            }
         }
         standStillStopwatch = null;
     }
@@ -84,13 +104,18 @@ public class RigidbodyAgent : Agent
     {
         if (!debug) return;
         if (debugGUI == null) return;
-        debugGUI.OnGUI("Velocity: " + debugGUI.LogVector3(rb.velocity), "Reward: " + GetCumulativeReward(), "Action: " + lastAction, "Steps: " + StepCount);
+        debugGUI.Display("Velocity: " + debugGUI.LogVector3(rb.velocity),
+            "Reward: " + GetCumulativeReward(),
+            "Action: " + lastAction,
+            "Steps: " + StepCount,
+            "Milestones: " + numHitMilestones,
+            "Target distance: " + targetDistance);
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(transform.localPosition);
-        sensor.AddObservation(rb.velocity);
+        sensor.AddObservation(rb.velocity.magnitude);
+        sensor.AddObservation(targetDistance);
         CollectRaycastObservations(sensor);
     }
 
@@ -112,16 +137,24 @@ public class RigidbodyAgent : Agent
 
     private void GetMovementRewards(float[] input)
     {
+        AddReward(forwardReward * input[1]);
+
+        if (input[2] > 0)
+        {
+            AddReward(brakePunishment);
+        }
+
         if (rb.velocity.magnitude > 5)
         {
-            if (input[1] > 0)
-            {
-                AddReward(forwardReward);
-            }
             standStillStopwatch = null;
+            if (rb.velocity.magnitude > 22)
+            {
+                AddReward(highSpeedReward);
+            }
         }
         else
         {
+            AddReward(-0.05f);
             if (standStillStopwatch == null)
             {
                 standStillStopwatch = Stopwatch.StartNew();
@@ -154,24 +187,30 @@ public class RigidbodyAgent : Agent
         RaycastHit hit;
         foreach (Transform target in raycastTargetsParent.transform)
         {
-            if (Physics.Raycast(raycastStartPos, target.position - raycastStartPos, out hit, raycastDistance, raycastLayer))
+            if (Physics.Raycast(raycastStartPos, target.position - raycastStartPos, out hit, raycastDistance, raycastLayer) && Mathf.Abs(hit.normal.y) < 0.7f)
             {
-                UnityEngine.Debug.DrawLine(raycastStartPos, hit.point, Color.red, 0.2f);
                 sensor.AddObservation(true);
                 sensor.AddObservation(hit.distance);
+                if (debug)
+                {
+                    UnityEngine.Debug.DrawLine(raycastStartPos, hit.point, Color.red, 0.1f);
+                }
             }
             else
             {
-                UnityEngine.Debug.DrawLine(raycastStartPos, raycastStartPos + (target.position - raycastStartPos).normalized * raycastDistance, Color.green, 0.2f);
                 sensor.AddObservation(false);
                 sensor.AddObservation(raycastDistance);
+                if (debug)
+                {
+                    UnityEngine.Debug.DrawLine(raycastStartPos, raycastStartPos + (target.position - raycastStartPos).normalized * raycastDistance, Color.green, 0.1f);
+                }
             }
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        AddReward(collisionPunishment);
+        AddReward(-1);
     }
 
     /// <summary>

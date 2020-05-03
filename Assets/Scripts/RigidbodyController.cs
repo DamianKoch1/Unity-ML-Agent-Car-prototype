@@ -100,7 +100,7 @@ public class RigidbodyController : MonoBehaviour
     private void OnGUI()
     {
         if (controlledByAgent) return;
-        debugGUI.OnGUI("Velocity: " + debugGUI.LogVector3(rb.velocity));
+        debugGUI.Display("Velocity: " + debugGUI.LogVector3(rb.velocity));
     }
 
     private void OnBrakeStart()

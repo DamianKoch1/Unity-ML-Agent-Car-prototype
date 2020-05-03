@@ -28,7 +28,7 @@ public class PlayerCamera : MonoBehaviour
         targetPos = target.transform.position;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         targetPos = Vector3.Lerp(targetPos, target.transform.position, Time.deltaTime * 5);
         transform.position = targetPos + offset.x * -target.transform.right + offset.y * Vector3.up + offset.z * target.transform.forward;

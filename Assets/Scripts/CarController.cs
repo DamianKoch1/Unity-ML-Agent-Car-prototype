@@ -56,7 +56,7 @@ public abstract class CarController<T> : MonoBehaviour where T : Axle
 
     private void OnGUI()
     {
-        debugGUI.OnGUI("Velocity: " + debugGUI.LogVector3(rb.velocity));
+        debugGUI.Display("Velocity: " + debugGUI.LogVector3(rb.velocity));
     }
 
     protected virtual void ProcessInput()
@@ -128,12 +128,12 @@ public abstract class Axle
 
 public class DebugGUI
 {
-    private Rect windowRect = new Rect(20, 20, 250, 50);
+    private Rect windowRect = new Rect(20, 20, 250, 200);
 
     private string[] content;
 
 
-    public void OnGUI(params string[] _content)
+    public void Display(params string[] _content)
     {
         content = _content;
         windowRect = GUILayout.Window(0, windowRect, UpdateWindow, "Car info");

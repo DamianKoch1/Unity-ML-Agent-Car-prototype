@@ -463,6 +463,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd5b35c41cce20449af2675822dc512f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controlledByAgent: 0
   maxForwardForce: 500
   rotateSpeed: 20
   brakeStrength: 1
