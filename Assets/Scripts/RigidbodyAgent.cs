@@ -35,6 +35,9 @@ public class RigidbodyAgent : Agent
     private DebugGUI debugGUI;
 
     [SerializeField]
+    private bool showGUI;
+
+    [SerializeField]
     private bool debug;
 
     [SerializeField]
@@ -76,7 +79,7 @@ public class RigidbodyAgent : Agent
         milestones = milestonesParent.GetComponentsInChildren<TrackMilestone>();
         goal = FindObjectOfType<Goal>();
         target = goal;
-        if (debug)
+        if (showGUI)
         {
             debugGUI = new DebugGUI();
         }
@@ -102,7 +105,7 @@ public class RigidbodyAgent : Agent
 
     private void OnGUI()
     {
-        if (!debug) return;
+        if (!showGUI) return;
         if (debugGUI == null) return;
         debugGUI.Display("Velocity: " + debugGUI.LogVector3(rb.velocity),
             "Reward: " + GetCumulativeReward(),
@@ -129,10 +132,7 @@ public class RigidbodyAgent : Agent
 
         CheckLoseConditions();
 
-        if (debug)
-        {
-            lastAction = new Vector3(vectorAction[0], vectorAction[1], vectorAction[2]);
-        }
+        lastAction = new Vector3(vectorAction[0], vectorAction[1], vectorAction[2]);
     }
 
     private void GetMovementRewards(float[] input)
